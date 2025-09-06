@@ -9,10 +9,10 @@ class UploadController(BaseController):
 
     def validate_uploaded_file(self, file: UploadFile):
         if (file.content_type not in self.allowed_types):
-            return False
+            return False, "File type is not allowed"
         
         if (file.size > self.size_limit):
-            return False
+            return False, f"File size is larger than {self.settings.FILE_MAX_SIZE_MB} MB"
         
-        return True
+        return True, "File is valid"
             

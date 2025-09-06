@@ -10,11 +10,14 @@ upload_base_rotue = APIRouter(
     tags=["data_v1"]
 )
 
+upload_controller = UploadController()
+
 @upload_base_rotue.post("/upload/{application_id}")
 async def upload_file(application_id: str, file: UploadFile):
-    upload_controller = UploadController()
-
-    if (not upload_controller.validate_uploaded_file(file)):
-        return {"message": "File is not valid"}
+    is_valid, message = upload_controller.validate_uploaded_file(file)
     
-    return {"message": "File uploaded successfully"}
+    return {
+        "is_valid": is_valid,
+        "message": message
+    }
+        
