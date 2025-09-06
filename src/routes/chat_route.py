@@ -10,5 +10,5 @@ chat_router = APIRouter(
 )
 
 @chat_router.get("/")
-def chat(): 
+async def chat(): 
     return {"message": "Hello World"}
