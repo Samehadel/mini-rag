@@ -17,3 +17,5 @@ class UploadService(BaseService):
         
         return True, ResponseMessages.FILE_IS_VALID.value
             
+def get_upload_service():
+    return UploadService()

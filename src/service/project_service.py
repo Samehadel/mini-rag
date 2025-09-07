@@ -39,4 +39,6 @@ class ProjectService(BaseService):
         
         return cleaned_file_name
         
-    
+
+def get_project_service():
+    return ProjectService()    

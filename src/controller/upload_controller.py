@@ -1,10 +1,8 @@
 from fastapi import APIRouter, UploadFile, status, Depends
 from fastapi.responses import JSONResponse
-from service.upload_service import UploadService
 from controller import base_controller
-from service import UploadService, ProjectService
+from service import UploadService, ProjectService, get_project_service, get_upload_service
 from helper.config import Settings, get_settings
-import os
 from model.enums import ResponseMessages
 import aiofiles
 import logging
@@ -17,11 +15,15 @@ upload_base_rotue = APIRouter(
     tags=["data_v1"]
 )
 
-upload_service = UploadService()
 logger = logging.getLogger('uvicorn.error')
 
 @upload_base_rotue.post("/upload/{application_id}")
-async def upload_file(application_id: str, file: UploadFile, app_settings: Settings = Depends(get_settings)):
+async def upload_file(
+    application_id: str, file: UploadFile, 
+    project_service: ProjectService = Depends(get_project_service), 
+    app_settings: Settings = Depends(get_settings),
+    upload_service: UploadService = Depends(get_upload_service)):
+
     valid, message = upload_service.validate_uploaded_file(file)
     
     if (not valid):
@@ -32,7 +34,6 @@ async def upload_file(application_id: str, file: UploadFile, app_settings: Setti
             }
         )
     
-    project_service = ProjectService()
     file_path = project_service.build_file_dir(application_id, file.filename)
     
     try: 
