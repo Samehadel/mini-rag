@@ -7,6 +7,7 @@ from helper.config import Settings, get_settings
 import os
 from model.enums import ResponseMessages
 import aiofiles
+import logging
 
 version = "v1"
 upload_file_base_route = f"{base_controller.global_base_route}/{version}"
@@ -17,6 +18,7 @@ upload_base_rotue = APIRouter(
 )
 
 upload_service = UploadService()
+logger = logging.getLogger('uvicorn.error')
 
 @upload_base_rotue.post("/upload/{application_id}")
 async def upload_file(application_id: str, file: UploadFile, app_settings: Settings = Depends(get_settings)):
@@ -33,9 +35,18 @@ async def upload_file(application_id: str, file: UploadFile, app_settings: Setti
     project_service = ProjectService()
     file_path = project_service.build_file_dir(application_id, file.filename)
     
-    async with aiofiles.open(file_path, 'wb') as out_file:
-        while chunk := await file.read(app_settings.FILE_DEFAULT_CHUNCK_SIZE):
-            await out_file.write(chunk)
+    try: 
+        async with aiofiles.open(file_path, 'wb') as out_file:
+            while chunk := await file.read(app_settings.FILE_DEFAULT_CHUNCK_SIZE):
+                await out_file.write(chunk)
+    except Exception as e:
+        logger.error(f"Failed to upload file: {e}")
+        return JSONResponse(
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content = {
+                "message": ResponseMessages.FILE_UPLOAD_FAILED.value
+            }
+        )
 
     return JSONResponse(
         content = {

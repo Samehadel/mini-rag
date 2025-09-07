@@ -5,4 +5,5 @@ class ResponseMessages(Enum):
     FILE_SIZE_TOO_LARGE = "File size is too large"
     FILE_IS_VALID = "File is valid"
     FILE_UPLOADED_SUCCESSFULLY = "File uploaded successfully"
+    FILE_UPLOAD_FAILED = "File upload failed"
     
