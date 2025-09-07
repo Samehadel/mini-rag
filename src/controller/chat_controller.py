@@ -1,8 +1,8 @@
 from fastapi import APIRouter
-from routes.base import global_base_route
+from controller import base_controller
 
 version = "v1"
-prefix = f"{global_base_route}/{version}/chat"
+prefix = f"{base_controller.global_base_route}/{version}/chat"
 
 chat_router = APIRouter(
  prefix=f"{prefix}",

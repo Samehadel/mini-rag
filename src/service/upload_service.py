@@ -1,8 +1,8 @@
-from .BaseController import BaseController
+from .base_service import BaseService
 from fastapi import UploadFile
 from model import ResponseMessages
 
-class UploadController(BaseController):
+class UploadService(BaseService):
     def __init__(self):
         super().__init__()
         self.size_limit = 1024 * 1024 * self.settings.FILE_MAX_SIZE_MB
