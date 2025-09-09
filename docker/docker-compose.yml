@@ -1,0 +1,19 @@
+services:
+  mongobd:
+    image: mongo:7-jammy
+    
+    container_name: mongobd
+    
+    ports:
+      - "27017:27017"
+    
+    volumes:
+      - ./mongobd:/data/db
+    
+    networks:
+      - backend
+
+    restart: always
+
+networks:
+  backend:
