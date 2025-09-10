@@ -4,3 +4,8 @@ python-multipart==0.0.20
 python-dotenv==1.0.1
 pydantic-settings==2.2.1
 aiofiles==23.2.1
+langchain==0.1.20
+langchain_community==0.0.38
+PyMuPDF==1.24.9
+motor==3.4.0
+pymongo==4.5.0

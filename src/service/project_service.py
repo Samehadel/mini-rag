@@ -9,6 +9,12 @@ class ProjectService(BaseService):
         self.string_service = StringService()
 
     def build_file_dir(self, application_id: str, file_name: str):
+        project_dir = self.build_project_dir(application_id)
+        file_name = self.generate_unique_file_name(file_name)
+        
+        return os.path.join(project_dir, file_name), file_name
+
+    def build_project_dir(self, application_id: str):
         project_dir = os.path.join(
             self.upload_dir, application_id
         )
@@ -16,9 +22,7 @@ class ProjectService(BaseService):
         if not os.path.exists(project_dir):
             os.makedirs(project_dir)
 
-        file_name = self.generate_unique_file_name(file_name)
-        return os.path.join(project_dir, file_name)
-
+        return project_dir
 
     def generate_unique_file_name(self, file_name: str):
         cleaned_file_name = self.get_clean_file_name(file_name)

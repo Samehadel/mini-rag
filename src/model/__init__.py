@@ -1,1 +1,1 @@
-from .enums import ResponseMessages
+from .enums import ResponseMessages, FileType
