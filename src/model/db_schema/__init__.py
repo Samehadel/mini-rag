@@ -1,2 +1,2 @@
-from .data_chunck import DataChunck
-from .project import Project
+from .data_chunck_entity import DataChunckEntity
+from .business_entity import BusinessEntity

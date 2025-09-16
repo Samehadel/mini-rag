@@ -1,2 +1,2 @@
-from .project_repository import ProjectRepository
+from .business_repository import BusinessRepository
 from .chunck_repository import ChunckRepository

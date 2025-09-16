@@ -39,3 +39,13 @@ $ cp .env.example .env
 ```
 
 Set your environment variables in the `.env` file. Like `OPENAI_API_KEY` value.
+
+# Docker compose
+
+You can use docker compose to run the application.
+
+```bash
+$ docker compose up -d
+```
+
+This will start the mongo db container.
