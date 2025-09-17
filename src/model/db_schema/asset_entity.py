@@ -22,7 +22,7 @@ class AssetEntity(BaseModel):
                     ('project_id', 1)
                 ],
                 'name': 'asset_project_id_index_1',
-                'unique': True
+                'unique': False
             },
             {
                 'key': [

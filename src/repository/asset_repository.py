@@ -28,24 +28,19 @@ class AssetRepository(BaseRepository):
         
         return asset
 
-    async def find_by_project_id(self, project_id: str):
+    async def find_by_project_id(self, project_id: str, type: str):
         self.logger.info(f"Finding assets by project id: {project_id}")
-        record = await self.collection.find({
-            'project_id': project_id
+        records = self.collection.find({
+            'project_id': project_id,
+            'asset_type': type
         })
 
         assets = []
-        if record is None:
-            return assets
+        if records is None:
+            return []
 
-        for asset in record:
+        async for asset in records:
             assets.append(AssetEntity(**asset))
         
         self.logger.info(f"Assets found by project id: {project_id}")
         return assets
-
-
-    def find_by_project_id(self, project_id: str):
-        return self.collection.find_one({
-            'project_id': project_id
-        })

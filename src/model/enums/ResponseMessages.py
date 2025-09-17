@@ -8,4 +8,5 @@ class ResponseMessages(Enum):
     FILE_UPLOAD_FAILED = "File upload failed"
     FILE_PROCESSED_SUCCESSFULLY = "File processed successfully"
     FILE_PROCESSED_FAILED = "File processed failed"
+    FILES_NOT_FOUND = "No files found for this project"
     

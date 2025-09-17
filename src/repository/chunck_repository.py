@@ -81,10 +81,8 @@ class ChunckRepository(BaseRepository):
         return chuncks, total_pages
 
     async def delete_chuncks_by_project_id(self, project_id: str):
-        project_id_object = ObjectId(project_id)
-        
         result = await self.collection.delete_many({
-            'chunck_project_id': project_id_object
+            'chunck_project_id': project_id
         })
         self.logger.info(f"Deleted {result.deleted_count} chuncks for project id: {project_id}")
         return result.deleted_count
