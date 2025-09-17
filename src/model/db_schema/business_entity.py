@@ -4,7 +4,7 @@ from typing import Optional
 
 class BusinessEntity(BaseModel):
     id: Optional[ObjectId] = Field(None, alias="_id")
-    project_id: str
+    project_id: str = Field(..., min_length=1)
 
     @validator("project_id")
     def validate(cls, value):

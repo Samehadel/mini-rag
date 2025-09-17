@@ -1,2 +1,3 @@
 from .business_repository import BusinessRepository
 from .chunck_repository import ChunckRepository
+from .asset_repository import AssetRepository

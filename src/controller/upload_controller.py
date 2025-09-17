@@ -7,8 +7,9 @@ from model.enums import ResponseMessages
 import aiofiles
 import logging
 from schema import ProcessRequest
-from repository import ChunckRepository, BusinessRepository
-from model import DataChunckEntity
+from repository import ChunckRepository, BusinessRepository, AssetRepository
+from model import DataChunckEntity, AssetEntity
+import os
 
 version = "v1"
 upload_file_base_route = f"{base_controller.global_base_route}/{version}"
@@ -55,7 +56,18 @@ async def upload_file(
         )
 
     business_repository = await BusinessRepository.create_instance(request.app.mongodb_client)
+    asset_repository = await AssetRepository.create_instance(request.app.mongodb_client)
+
     business_entity = await business_repository.find_by_project_id_or_create(project_id)
+
+    asset_entity = AssetEntity(
+        project_id=project_id,
+        asset_type="file",
+        asset_name=file_name,
+        asset_size=os.path.getsize(file_path)
+    )
+    
+    await asset_repository.save(asset_entity)
     
     return JSONResponse(
         content = {

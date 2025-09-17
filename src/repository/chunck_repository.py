@@ -36,7 +36,7 @@ class ChunckRepository(BaseRepository):
             batch = chuncks[i:i + batch_size]
             
             operations = [
-                InsertOne(chunck.dict()) 
+                InsertOne(chunck.dict(by_alias=True, exclude_unset=True)) 
                 for chunck in batch
             ]
 
