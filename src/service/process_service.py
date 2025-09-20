@@ -12,11 +12,18 @@ class ProcessService(BaseService):
         
     def read_file(self, file_name: str):
         loader = self.get_document_loader(file_name)
+        
+        if loader is None:
+            return None
+        
         return loader.load()
 
     def get_document_loader(self, file_name: str):
         file_extension = self.get_file_extension(file_name)
         file_path = os.path.join(self.project_dir, file_name)
+        
+        if not os.path.exists(file_path):
+            return None
         
         return DocumentReaderFactory.get_document_reader(file_path, file_extension)  
     

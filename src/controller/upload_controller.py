@@ -97,24 +97,29 @@ async def process_file(request: Request, project_id: str, process_request: Proce
     business_repository = await BusinessRepository.create_instance(request.app.mongodb_client)
     business_entity = await business_repository.find_by_project_id_or_create(project_id)
     
+    failed_files = []
+    processed_files = []
     for asset_entity in asset_entities:
         pages = process_service.read_file(asset_entity.asset_name)
-        chuncks = process_service.process_documents(pages, process_request.chunck_size, process_request.overlap_size)
 
+        if pages is None or len(pages) == 0:
+            failed_files.append(asset_entity.asset_name)
+            continue
+        
+        chuncks = process_service.process_documents(pages, process_request.chunck_size, process_request.overlap_size)
         if chuncks is None or len(chuncks) == 0:
-            return JSONResponse(
-                status_code = status.HTTP_400_BAD_REQUEST,
-                content = {
-                    "message": ResponseMessages.FILE_PROCESSED_FAILED.value
-                }
-            )
+            failed_files.append(asset_entity.asset_name)
+            continue
     
         no_of_chuncks = await save_chuncks(chuncks, project_id, business_entity.id, request)
+        processed_files.append(asset_entity.asset_name)
     
     return JSONResponse(
         content = {
             "message": ResponseMessages.FILE_PROCESSED_SUCCESSFULLY.value,
-            "number_of_processed_files": len(asset_entities)
+            "processed_files": processed_files,
+            "failed_files": failed_files,
+            "business_entity_id": str(business_entity.id)
         }
     )
 

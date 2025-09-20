@@ -55,13 +55,10 @@ class BusinessRepository(BaseRepository):
             limit=page_size
         )
         
-        businesses = []
-
-        async for record in cursor:
-            businesses.append(
-                BusinessEntity(**record)
-            )
-            
+        businesses = [
+            BusinessEntity(**record)
+            async for record in cursor
+        ]            
 
         return businesses, total_pages
         

@@ -35,12 +35,7 @@ class AssetRepository(BaseRepository):
             'asset_type': type
         })
 
-        assets = []
-        if records is None:
-            return []
-
-        async for asset in records:
-            assets.append(AssetEntity(**asset))
-        
-        self.logger.info(f"Assets found by project id: {project_id}")
-        return assets
+        return [
+            AssetEntity(**record)
+            async for record in records
+        ]

@@ -44,18 +44,6 @@ class ChunckRepository(BaseRepository):
         
         return len(chuncks)
 
-    async def get_chunck(self, chunck_id: str):
-        objectId = ObjectId(chunck_id)
-        
-        record = self.collection.find_one({
-            '_id': objectId
-        })
-
-        if record is None:
-            return None
-        
-        return DataChunck(**record)
-
     async def find_all(self, application_id: str, page: int = 0, page_size: int = 10):
         application_id_object = ObjectId(application_id)
         
@@ -72,11 +60,10 @@ class ChunckRepository(BaseRepository):
             limit=page_size
         )
         
-        chuncks = []
-        async for record in cursor:
-            chuncks.append(
-                DataChunckEntity(**record)
-            )
+        chuncks = [
+            DataChunckEntity(**record)
+            async for record in cursor
+        ]
             
         return chuncks, total_pages
 
