@@ -81,12 +81,12 @@ class CohereLLM(LLMInterface):
         if self.valid_embedding_model() is False:
             return None
         
-        if not query_type or (query_type != CohereQueryType.QUERY.value and query_type != CohereQueryType.EMBEDDING.value):
+        if not query_type or (query_type != CohereQueryType.QUERY.value and query_type != CohereQueryType.DOCUMENT.value):
             raise ValueError(f"Invalid query type: {query_type}")
         
         response = self.client.embed(
             model=self.embedding_model_id,
-            text=[self.process_text(text)],
+            texts=[self.process_text(text)],
             input_type=query_type,
             embedding_types=["float"]
         )

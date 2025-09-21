@@ -21,7 +21,7 @@ class LLMInterface(ABC):
         pass
 
     @abstractmethod
-    def generate_embedding(self, text: str, document_type: str = None):
+    def generate_embedding(self, text: str, query_type: str = None):
         pass
 
     @abstractmethod

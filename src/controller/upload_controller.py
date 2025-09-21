@@ -11,6 +11,9 @@ from repository import ChunckRepository, BusinessRepository, AssetRepository
 from model import DataChunckEntity, AssetEntity
 import os
 from model.enums import AssetType
+from vector import VectorDBFactory, VectorDBInterface
+from service.llm import LLMInterface
+from model.enums.llms import CohereQueryType
 
 version = "v1"
 upload_file_base_route = f"{base_controller.global_base_route}/{version}"
@@ -21,6 +24,8 @@ upload_base_rotue = APIRouter(
 )
 
 logger = logging.getLogger('uvicorn.error')
+vector_db_factory = VectorDBFactory()
+vector_db = vector_db_factory.create_vector_db()
 
 @upload_base_rotue.post("/upload/{project_id}")
 async def upload_file(
@@ -138,4 +143,31 @@ async def save_chuncks(chuncks: list, project_id: str, business_entity_id: str, 
     _ = await chunck_repository.delete_chuncks_by_project_id(project_id)
     no_of_chuncks = await chunck_repository.saveall(chuncks=chunck_data_list)
 
+    save_chuncks_to_vector_db(chuncks, project_id, request)
     return no_of_chuncks
+
+
+def save_chuncks_to_vector_db(chuncks: list, project_id: str, request: Request):
+    vector_db_client: VectorDBInterface = request.app.vector_db_client
+    embedding_client: LLMInterface = request.app.embedding_client
+
+    vector_db_client.create_collection(
+        collection_name=project_id,
+        do_reset=True
+    )
+    
+    chunck_embeddings = []
+    for chunck in chuncks:
+        chunck_embeddings = embedding_client.generate_embedding(
+            text=chunck.page_content,
+            query_type=CohereQueryType.DOCUMENT.value
+        )
+
+        chunck_embeddings.append(chunck_embeddings)
+    
+    vector_db_client.insert_many(
+        collection_name=project_id,
+        texts=[chunck.page_content for chunck in chuncks],
+        vectors=chunck_embeddings,
+        metadata=[chunck.metadata for chunck in chuncks]
+    )

@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from controller import base_controller
 from schema.chat_request import ChatRequest
-from service.llm import LLMFactory
+from fastapi import Request
 version = "v1"
 prefix = f"{base_controller.global_base_route}/{version}/chat"
 
@@ -11,14 +11,15 @@ chat_router = APIRouter(
 )
 
 @chat_router.post("/")
-async def chat(request: ChatRequest): 
+async def chat(request: Request, chat_request: ChatRequest, ): 
     
-    llm_provider = LLMFactory.create_generation_llm(request)
+    llm_provider = request.app.llm
+
     response = llm_provider.generate_text(
-        prompt=request.prompt, 
-        chat_history=request.chat_history, 
-        max_output_tokens=request.max_output_tokens, 
-        temperature=request.temperature
+        prompt=chat_request.prompt, 
+        chat_history=chat_request.chat_history, 
+        max_output_tokens=chat_request.max_output_tokens, 
+        temperature=chat_request.temperature
     )
 
     return response

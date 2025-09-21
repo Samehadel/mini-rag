@@ -5,23 +5,28 @@ class Settings(BaseSettings):
     APP_NAME: str
     APP_VERSION: str
 
-    LLM_PROVIDER: str
-    
-    OPENAI_API_KEY: str
-    OPENAI_GENERATION_MODEL: str
-    OPENAI_EMBEDDING_MODEL: str
-
-    # Cohere settings (optional)
-    COHERE_API_KEY: str | None = None
-    COHERE_GENERATION_MODEL: str | None = None
-    COHERE_EMBEDDING_MODEL: str | None = None
-
     FILE_ALLOWED_TYPES: list[str]
     FILE_MAX_SIZE_MB: int
     FILE_DEFAULT_CHUNCK_SIZE: int
 
     MONGODB_URL: str
     MONGODB_DATABASE: str
+
+    # LLM Config
+    GENERATION_PROVIDER: str
+    EMBEDDING_PROVIDER: str
+    EMBDDING_SIZE: int
+    
+    GENERATION_MODEL_ID: str
+    EMBEDDING_MODEL_ID: str
+
+    OPENAI_API_KEY: str
+    COHERE_API_KEY: str
+
+    # Vector DB Config
+    VECTOR_DB_PROVIDER: str
+    QDRANT_DB_PATH: str
+    DISTANCE_METHOD: str
     
     class Config:
         env_file = ".env"
