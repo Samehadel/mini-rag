@@ -1,6 +1,11 @@
 from abc import ABC, abstractmethod
 
 class LLMInterface(ABC):
+    def process_text(self, prompt: str):
+        if len(prompt) > self.max_input_characters:
+            prompt = prompt[:self.max_input_characters]
+
+        return prompt
     
     @abstractmethod
     def set_generation_model(self, model_id: str):

@@ -21,7 +21,7 @@ async def setup_mongodb_connection():
 async def close_mongodb_connection():
     logger.info("Closing MongoDB connection")
     app.mongodb_connection.close()
-
+    
 app.include_router(base_controller.base_router)
 app.include_router(chat_controller.chat_router)
 app.include_router(upload_controller.upload_base_rotue)

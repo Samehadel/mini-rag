@@ -8,13 +8,13 @@ class OpenAILLM(LLMInterface):
     def __init__(self, api_url: str = None, api_key: str = None, max_input_characters: int = 1000,
     max_output_tokens: int = 1000, temperature: float = 0.1):
         super().__init__()
+        settings = get_settings()
         self.api_key = api_key if api_key else settings.OPENAI_API_KEY
         self.api_url = api_url
         self.max_input_characters = max_input_characters
         self.default_max_output_tokens = max_output_tokens
         self.default_temperature = temperature
         self.logger = logging.getLogger(__name__)
-        settings = get_settings()
     
 
         self.generation_model_id = None
@@ -25,6 +25,8 @@ class OpenAILLM(LLMInterface):
             api_key=self.api_key,
             base_url=self.api_url
         )
+
+        self.logger.info("OpenAI client initialized")
     
     def set_generation_model(self, model_id: str):
         self.generation_model_id = model_id
@@ -60,12 +62,6 @@ class OpenAILLM(LLMInterface):
 
         return response.choices[0].message.content
 
-    def process_prompt(self, prompt: str):
-        if len(prompt) > self.max_input_characters:
-            prompt = prompt[:self.max_input_characters]
-
-        return prompt
-
     def valid_generation_response(self, response):
         if not response or not response.choices or len(response.choices) == 0 or not response.choices[0].message:
             self.logger.error("Failed to generate text")
@@ -74,7 +70,7 @@ class OpenAILLM(LLMInterface):
         return True
     
     def constrcut_prompt(self, prompt: str, role: str):
-        user_processed_prompt = self.process_prompt(prompt)
+        user_processed_prompt = self.process_text(prompt)
         return {
             "role": role,
             "content": user_processed_prompt

@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends
-from helper.config import Settings, get_settings
+from fastapi import APIRouter
+from helper.config import get_settings
 
 global_base_route = "/demo/api"
 
-app_settings: Settings = Depends(get_settings)
-application_name = get_settings().APP_NAME
-version = get_settings().APP_VERSION
+app_settings = get_settings()
+application_name = app_settings.APP_NAME
+version = app_settings.APP_VERSION
 
 base_router = APIRouter(
     prefix=f"{global_base_route}/v1",
