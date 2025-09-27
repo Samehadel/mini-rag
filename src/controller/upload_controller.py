@@ -85,10 +85,10 @@ async def upload_file(
     )
         
         
-@upload_base_rotue.post("/process/{project_id}")
-async def process_file(request: Request, project_id: str, process_request: ProcessRequest):
+@upload_base_rotue.post("/process")
+async def process_file(request: Request, process_request: ProcessRequest):
     asset_repository = await AssetRepository.create_instance(request.app.mongodb_client)
-    asset_entities = await asset_repository.find_by_project_id(project_id, AssetType.FILE.value)
+    asset_entities = await asset_repository.find_by_project_id(process_request.project_id, AssetType.FILE.value)
     
     if asset_entities is None or len(asset_entities) == 0:
         return JSONResponse(
@@ -98,9 +98,9 @@ async def process_file(request: Request, project_id: str, process_request: Proce
             }
         )
     
-    process_service = ProcessService(project_id)
+    process_service = ProcessService(process_request.project_id)
     business_repository = await BusinessRepository.create_instance(request.app.mongodb_client)
-    business_entity = await business_repository.find_by_project_id_or_create(project_id)
+    business_entity = await business_repository.find_by_project_id_or_create(process_request.project_id)
     
     failed_files = []
     processed_files = []
@@ -116,7 +116,7 @@ async def process_file(request: Request, project_id: str, process_request: Proce
             failed_files.append(asset_entity.asset_name)
             continue
     
-        no_of_chuncks = await save_chuncks(chuncks, project_id, business_entity.id, request)
+        no_of_chuncks = await save_chuncks(chuncks, process_request, business_entity.id, request)
         processed_files.append(asset_entity.asset_name)
     
     return JSONResponse(
@@ -124,11 +124,12 @@ async def process_file(request: Request, project_id: str, process_request: Proce
             "message": ResponseMessages.FILE_PROCESSED_SUCCESSFULLY.value,
             "processed_files": processed_files,
             "failed_files": failed_files,
-            "business_entity_id": str(business_entity.id)
+            "business_entity_id": str(business_entity.id),
+            "no_of_chuncks": no_of_chuncks
         }
     )
 
-async def save_chuncks(chuncks: list, project_id: str, business_entity_id: str, request: Request):
+async def save_chuncks(chuncks: list, process_request: ProcessRequest, business_entity_id: str, request: Request):
     chunck_data_list = [
         DataChunckEntity(
             chunck_text=chunck.page_content,
@@ -140,34 +141,9 @@ async def save_chuncks(chuncks: list, project_id: str, business_entity_id: str, 
         ]   
 
     chunck_repository = await ChunckRepository.create_instance(request.app.mongodb_client)
-    _ = await chunck_repository.delete_chuncks_by_project_id(project_id)
+    if process_request.do_reset:
+        _ = await chunck_repository.delete_chuncks_by_project_id(process_request.project_id)
+    
     no_of_chuncks = await chunck_repository.saveall(chuncks=chunck_data_list)
 
-    save_chuncks_to_vector_db(chuncks, project_id, request)
     return no_of_chuncks
-
-
-def save_chuncks_to_vector_db(chuncks: list, project_id: str, request: Request):
-    vector_db_client: VectorDBInterface = request.app.vector_db_client
-    embedding_client: LLMInterface = request.app.embedding_client
-
-    vector_db_client.create_collection(
-        collection_name=project_id,
-        do_reset=True
-    )
-    
-    chunck_embeddings = []
-    for chunck in chuncks:
-        chunck_embeddings = embedding_client.generate_embedding(
-            text=chunck.page_content,
-            query_type=CohereQueryType.DOCUMENT.value
-        )
-
-        chunck_embeddings.append(chunck_embeddings)
-    
-    vector_db_client.insert_many(
-        collection_name=project_id,
-        texts=[chunck.page_content for chunck in chuncks],
-        vectors=chunck_embeddings,
-        metadata=[chunck.metadata for chunck in chuncks]
-    )

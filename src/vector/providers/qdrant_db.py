@@ -98,7 +98,6 @@ class QdrantDB(VectorDBInterface):
             batch_texts = texts[i:i + batch_size]
             batch_vectors = vectors[i:i + batch_size]
             batch_metadata = metadata[i:i + batch_size]
-            batch_record_ids = record_ids[i:i + batch_size]
 
             batch_records = [
                 self.upload_records(

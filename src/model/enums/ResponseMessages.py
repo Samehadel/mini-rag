@@ -6,7 +6,7 @@ class ResponseMessages(Enum):
     FILE_IS_VALID = "File is valid"
     FILE_UPLOADED_SUCCESSFULLY = "File uploaded successfully"
     FILE_UPLOAD_FAILED = "File upload failed"
-    FILE_PROCESSED_SUCCESSFULLY = "File processed successfully"
-    FILE_PROCESSED_FAILED = "File processed failed"
+    FILE_PROCESSED_SUCCESSFULLY = "File(s) processed successfully"
+    FILE_PROCESSED_FAILED = "File(s) processed failed"
     FILES_NOT_FOUND = "No files found for this project"
     
